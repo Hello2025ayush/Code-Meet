@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./config/db.js";
 import sessionRouter from "./routes/session.router.js";            
-
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 // System config..
 dotenv.config();
@@ -26,3 +26,5 @@ app.listen(PORT, () => {                                // .listen starts the se
     console.log(`Server is running on PORT: ${PORT}`);      
 })
  
+
+app.use(errorHandler);

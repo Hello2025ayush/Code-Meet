@@ -1,14 +1,24 @@
 import Session from "../models/session.model.js"
 import generateCode from "../utils/generateSessionCode.js";
 
-
-const createSession = async (req, res) => {
+// CREATE SESSION
+export const createSession = async (req, res) => {
     const field = req.body;
 
 
     const interviewerName =  field.interviewerName;
-    const sessionCode = generateCode();
     const expiresAt = new Date(Date.now() + 60*60*1000);   // 1hr
+
+
+    // collision free session code..
+    let exist = true;
+    const sessionCode = generateCode();
+    while(exist){
+        const query = await Session.findOne({sessionCode});        // don't forget await   
+        if(!query) exist = false;
+    }
+
+    
 
     console.log("Somebody trying to create a Session ................. !!! #######");
     
@@ -28,4 +38,33 @@ const createSession = async (req, res) => {
     }
 }
 
-export default createSession;
+
+
+// JOIN SESSION
+
+export const joinSession = async (req, res) => {
+    const sessionCode = req.body.sessionCode;
+
+    const session = await Session.findOne({sessionCode});     // use await for asynchronous.
+
+    if(!session){
+        return res.status(404).json({
+            success: false,
+            message: "Session Code not found !!"
+        })
+    }
+
+    if(session.expiresAt < new Date()){
+        return res.status(404).json({
+            success: false,
+            message: "Session is Expired"
+        })
+    }
+
+    res.json({success: true, session});                     // send session details to client
+
+}
+
+// export default {createSession, joinSession};        // import xyz from "here" and then
+                                                    // you have to use it as -- xyz.createSession()
+                                                    // better option is directly export function...
