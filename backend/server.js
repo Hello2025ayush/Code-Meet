@@ -5,7 +5,11 @@ import connectDB from "./config/db.js";
 import sessionRouter from "./routes/session.router.js";            
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { editorSocket } from "./sockets/editorSocket.js";  
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 // SOCKET IO 
@@ -52,14 +56,10 @@ server.listen(PORT, () => {                                    // .listen starts
 app.use(errorHandler);
 
 // frontend connection for deployment..
-import { fileURLToPath } from "url";
-import path from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, "../frontend/dist");
+app.use(express.static(distPath));
 
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+app.use((req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
 });
