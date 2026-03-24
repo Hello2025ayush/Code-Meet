@@ -8,6 +8,12 @@ const sessionSchema = new mongoose.Schema({
         unique: true
     },
 
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+
     interviewerName:{
         type: String,
         required: true
@@ -28,9 +34,16 @@ const sessionSchema = new mongoose.Schema({
         default: ""
     },
 
-    lanuage:{
+    // Proper field name (preferred).
+    language:{
         type: String,
         default: "cpp"
+    },
+
+    // Backwards compatibility: keep the old typo field.
+    lanuage:{
+        type: String,
+        default: undefined
     },
 
     expiresAt: {
@@ -39,6 +52,9 @@ const sessionSchema = new mongoose.Schema({
     }
 
 }, {timestamps: true});
+
+// Automatically remove expired sessions.
+sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 
 const Session = mongoose.model("Session", sessionSchema);

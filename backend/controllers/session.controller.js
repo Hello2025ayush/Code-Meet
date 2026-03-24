@@ -3,19 +3,30 @@ import generateCode from "../utils/generateSessionCode.js";
 
 // CREATE SESSION
 export const createSession = async (req, res) => {
-    const field = req.body;
-
-
-    const interviewerName =  field.interviewerName;
+    const interviewerName = req.user?.name || req.body?.interviewerName;
+    const createdBy = req.user?.userId;
+    if(!interviewerName){
+        return res.status(400).json({
+            success: false,
+            message: "Interviewer Name is Required"
+        });
+    }
+    if(!createdBy){
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        });
+    }
     const expiresAt = new Date(Date.now() + 60*60*1000);   // 1hr
 
 
     // collision free session code..
     let exist = true;
-    const sessionCode = generateCode();
+    let sessionCode = generateCode();
     while(exist){
         const query = await Session.findOne({sessionCode});        // don't forget await   
         if(!query) exist = false;
+        else sessionCode = generateCode();
     }
 
     
@@ -25,6 +36,7 @@ export const createSession = async (req, res) => {
     const session  = new Session({          // create instance of Schema
         interviewerName,
         sessionCode,
+        createdBy,
         expiresAt
     })
 
