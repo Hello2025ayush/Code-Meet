@@ -52,7 +52,11 @@ server.listen(PORT, () => {                                    // .listen starts
 app.use(errorHandler);
 
 // frontend connection for deployment..
+import { fileURLToPath } from "url";
 import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
