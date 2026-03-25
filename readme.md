@@ -147,6 +147,7 @@ FRONTEND_ORIGIN="http://localhost:5173"
 **Terminal 1 - Start Backend Server:**
 
 ```bash
+cd backend
 npm run dev
 ```
 
@@ -173,6 +174,7 @@ npm run build
 **Start Backend:**
 
 ```bash
+cd backend
 npm start
 ```
 
@@ -235,6 +237,9 @@ Code-Meet/
 │   ├── .env                              # Environment variables
 │   ├── .env.example                      # Environment template
 │   ├── .gitignore                        # Git ignore rules
+│   ├── package.json                      # Backend dependencies
+│   ├── package-lock.json                 # Dependency lock file
+│   ├── node_modules/                     # Backend node packages
 │   └── server.js                         # Main server file
 │
 ├── frontend/
@@ -264,7 +269,6 @@ Code-Meet/
 │   ├── package.json                      # Frontend dependencies
 │   └── .env                              # Frontend environment variables
 │
-├── package.json                          # Root package.json
 └── README.md                             # This file
 ```
 

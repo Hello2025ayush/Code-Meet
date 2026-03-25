@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 import http from "http";
 import { Server } from "socket.io";
  
-dotenv.config({ path: "./backend/.env" });
+dotenv.config({ path: "./.env" });
 const { default: authRouter } = await import("./routes/auth.router.js");
 const { authSocket } = await import("./middlewares/authSocket.js");
 const frontendOrigin = process.env.FRONTEND_ORIGIN || "*";
