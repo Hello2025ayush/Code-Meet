@@ -24,7 +24,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors:{
-        origin: frontendOrigin
+        origin: frontendOrigin,
+        credentials: true   
     }
 });              // instance of socket.io
 
@@ -32,7 +33,10 @@ const io = new Server(server, {
 
 // System config..
 app.use(express.json());                  // converting OR Parsing json into js object
-app.use(cors({ origin: frontendOrigin }));
+app.use(cors({
+  origin: frontendOrigin,
+  credentials: true
+}));
 app.use("/auth", authRouter);
 
 // Socket auth (JWT). This runs before any socket handlers.
