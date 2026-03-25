@@ -2,10 +2,14 @@ import Session from "../models/session.model.js";
 
 // Debounce DB writes per session+field to avoid hammering Mongo on every keystroke.
 const dbSaveTimers = new Map();
+const pendingUploads = new Map();  // Track pending changes: key -> value
 const allowedLanguages = new Set(["cpp", "python", "java"]);
 
 const scheduleSave = (sessionCode, field, value) => {
     const key = `${sessionCode}:${field}`;
+
+    // Store the pending value
+    pendingUploads.set(key, { sessionCode, field, value });
 
     if(dbSaveTimers.has(key)){
         clearTimeout(dbSaveTimers.get(key));
@@ -17,6 +21,7 @@ const scheduleSave = (sessionCode, field, value) => {
                 { sessionCode },
                 { [field]: value }
             );
+            pendingUploads.delete(key);
         }
         catch(error){
             console.log("DB save failed:", error.message);
@@ -114,7 +119,37 @@ export const editorSocket = (io) => {
             scheduleSave(sessionCode, "code", code || "");
         })
 
-        
+        // Flush pending saves when user disconnects
+        socket.on("disconnect", async () => {
+            console.log(`USER DISCONNECTED ::: ${socket.id}`);
+            
+            // Find and flush all pending saves
+            const keys = Array.from(dbSaveTimers.keys());
+            for (const key of keys) {
+                const timer = dbSaveTimers.get(key);
+                const pendingData = pendingUploads.get(key);
+                
+                // Clear the timer
+                if (timer) clearTimeout(timer);
+                
+                // Immediately save pending data
+                if (pendingData) {
+                    try {
+                        const { sessionCode, field, value } = pendingData;
+                        await Session.findOneAndUpdate(
+                            { sessionCode },
+                            { [field]: value }
+                        );
+                        console.log(`Flushed pending save on disconnect: ${sessionCode}.${field}`);
+                    } catch (error) {
+                        console.log(`Error flushing save on disconnect: ${error.message}`);
+                    }
+                }
+                
+                dbSaveTimers.delete(key);
+                pendingUploads.delete(key);
+            }
+        });
 
     });
 }
