@@ -315,10 +315,9 @@ graph TD
 - Code execution environment
 - Video/Audio calling
 - Real-time chat
-- Session recording & playback
-- Problem difficulty levels & categories
-- User ratings & leaderboard
-- Language-specific test frameworks
+- Session timeline chart
+
+
 
 ---
 
@@ -327,4 +326,4 @@ graph TD
 **Ayush Talreja**
 - GitHub: [@Hello2025ayush](https://github.com/Hello2025ayush)
 
-**Last Updated**: March 2025
+
